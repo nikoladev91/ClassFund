@@ -2,7 +2,7 @@
     <string name="app_name">ClassFund</string>
     <string name="welcome_tagline">Przejrzyste finanse i organizacja życia klasy</string>
     <string name="login">Zaloguj się</string>
-    <string name="register">Załóż konto</string>
+    <string name="register">Utwórz konto</string>
     <string name="version_label">ClassFund v0.1 Alpha</string>
 
     <string name="login_placeholder">Tutaj będzie ekran logowania</string>
