@@ -13,10 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import pl.nikola.classfund.R
 
 @Composable
 fun WelcomeScreen(
@@ -31,7 +33,7 @@ fun WelcomeScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "ClassFund",
+            text = stringResource(R.string.app_name),
             fontSize = 40.sp,
             fontWeight = FontWeight.Bold
         )
@@ -39,7 +41,7 @@ fun WelcomeScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Przejrzyste finanse i organizacja życia klasy",
+            text = stringResource(R.string.welcome_tagline),
             fontSize = 18.sp,
             textAlign = TextAlign.Center
         )
@@ -50,7 +52,7 @@ fun WelcomeScreen(
             onClick = onLoginClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Zaloguj się")
+            Text(text = stringResource(R.string.login))
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -59,13 +61,13 @@ fun WelcomeScreen(
             onClick = onRegisterClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Załóż konto")
+            Text(text = stringResource(R.string.register))
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Wersja 0.1",
+            text = stringResource(R.string.version_label),
             fontSize = 12.sp
         )
     }

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">ClassFund</string>
+    <string name="welcome_tagline">Transparent class finances and organization</string>
+    <string name="login">Sign in</string>
+    <string name="register">Create account</string>
+    <string name="version_label">ClassFund v0.1 Alpha</string>
+
+    <string name="login_placeholder">Login screen will be added here</string>
+    <string name="register_placeholder">Registration screen will be added here</string>
 </resources>
