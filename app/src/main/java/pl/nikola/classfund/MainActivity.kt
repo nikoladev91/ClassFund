@@ -1,47 +1,38 @@
 package pl.nikola.classfund
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import pl.nikola.classfund.ui.screens.WelcomeScreen
 import pl.nikola.classfund.ui.theme.ClassFundTheme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             ClassFundTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                WelcomeScreen(
+                    onLoginClick = {
+                        Toast.makeText(
+                            this,
+                            "Tutaj będzie logowanie",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    onRegisterClick = {
+                        Toast.makeText(
+                            this,
+                            "Tutaj będzie rejestracja",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ClassFundTheme {
-        Greeting("Android")
     }
 }
