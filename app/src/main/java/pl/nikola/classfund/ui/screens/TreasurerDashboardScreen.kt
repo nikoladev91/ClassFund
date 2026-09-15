@@ -1,5 +1,6 @@
 package pl.nikola.classfund.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +27,10 @@ fun TreasurerDashboardScreen(
     className: String,
     schoolYear: String,
     balance: Double,
-    onAddPaymentClick: () -> Unit
+    onAddPaymentClick: () -> Unit,
+    onPaymentsClick: () -> Unit,
+    onExpensesClick: () -> Unit,
+    onStudentsClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -88,17 +92,26 @@ fun TreasurerDashboardScreen(
 
             Text(
                 text = stringResource(R.string.payments_tab),
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable {
+                    onPaymentsClick()
+                }
             )
 
             Text(
                 text = stringResource(R.string.expenses_tab),
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable {
+                    onExpensesClick()
+                }
             )
 
             Text(
                 text = stringResource(R.string.students_tab),
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable {
+                    onStudentsClick()
+                }
             )
         }
 

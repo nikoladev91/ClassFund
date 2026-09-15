@@ -9,15 +9,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import pl.nikola.classfund.data.LocalStorage
+import pl.nikola.classfund.model.Expense
+import pl.nikola.classfund.model.Payment
+import pl.nikola.classfund.ui.screens.AddExpenseScreen
 import pl.nikola.classfund.ui.screens.AddPaymentScreen
+import pl.nikola.classfund.ui.screens.AddStudentScreen
 import pl.nikola.classfund.ui.screens.CreateClassScreen
 import pl.nikola.classfund.ui.screens.JoinClassScreen
 import pl.nikola.classfund.ui.screens.ParentRegisterScreen
+import pl.nikola.classfund.ui.screens.PaymentsScreen
 import pl.nikola.classfund.ui.screens.RoleSelectionScreen
+import pl.nikola.classfund.ui.screens.StudentDetailsScreen
+import pl.nikola.classfund.ui.screens.StudentsScreen
 import pl.nikola.classfund.ui.screens.TreasurerDashboardScreen
 import pl.nikola.classfund.ui.screens.TreasurerRegisterScreen
 import pl.nikola.classfund.ui.screens.WelcomeScreen
 import pl.nikola.classfund.ui.theme.ClassFundTheme
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
@@ -28,20 +39,40 @@ class MainActivity : ComponentActivity() {
         setContent {
             ClassFundTheme {
 
+                val localStorage = remember {
+                    LocalStorage(this)
+                }
+
                 var currentScreen by remember {
-                    mutableStateOf("welcome")
+                    mutableStateOf("treasurer_dashboard")
                 }
 
                 var createdClassName by remember {
-                    mutableStateOf("")
+                    mutableStateOf(localStorage.getClassName())
                 }
 
                 var createdSchoolYear by remember {
-                    mutableStateOf("")
+                    mutableStateOf(localStorage.getSchoolYear())
                 }
 
                 var classBalance by remember {
-                    mutableStateOf(0.0)
+                    mutableStateOf(localStorage.getBalance())
+                }
+
+                var students by remember {
+                    mutableStateOf(localStorage.getStudents())
+                }
+
+                var payments by remember {
+                    mutableStateOf(localStorage.getPayments())
+                }
+
+                var expenses by remember {
+                    mutableStateOf(localStorage.getExpenses())
+                }
+
+                var selectedStudent by remember {
+                    mutableStateOf("")
                 }
 
                 when (currentScreen) {
@@ -86,8 +117,13 @@ class MainActivity : ComponentActivity() {
                     "create_class" -> {
                         CreateClassScreen(
                             onCreateClassClick = { className, schoolYear ->
+
                                 createdClassName = className
                                 createdSchoolYear = schoolYear
+
+                                localStorage.saveClassName(className)
+                                localStorage.saveSchoolYear(schoolYear)
+
                                 currentScreen = "treasurer_dashboard"
                             },
                             onBackClick = {
@@ -103,18 +139,136 @@ class MainActivity : ComponentActivity() {
                             balance = classBalance,
                             onAddPaymentClick = {
                                 currentScreen = "add_payment"
+                            },
+                            onPaymentsClick = {
+                                currentScreen = "payments"
+                            },
+                            onExpensesClick = {
+                                currentScreen = "add_expense"
+                            },
+                            onStudentsClick = {
+                                currentScreen = "students"
+                            }
+                        )
+                    }
+
+                    "students" -> {
+                        StudentsScreen(
+                            students = students,
+                            onStudentClick = { studentName ->
+                                selectedStudent = studentName
+                                currentScreen = "student_details"
+                            },
+                            onAddStudentClick = {
+                                currentScreen = "add_student"
+                            },
+                            onBackClick = {
+                                currentScreen = "treasurer_dashboard"
+                            }
+                        )
+                    }
+
+                    "student_details" -> {
+                        StudentDetailsScreen(
+                            studentName = selectedStudent,
+                            payments = payments,
+                            onBackClick = {
+                                currentScreen = "students"
+                            }
+                        )
+                    }
+
+                    "add_student" -> {
+                        AddStudentScreen(
+                            onSaveStudentClick = { studentName ->
+
+                                students = students + studentName
+                                localStorage.saveStudents(students)
+
+                                Toast.makeText(
+                                    this,
+                                    "Dodano ucznia: $studentName",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                currentScreen = "students"
+                            },
+                            onBackClick = {
+                                currentScreen = "students"
                             }
                         )
                     }
 
                     "add_payment" -> {
                         AddPaymentScreen(
+                            students = students,
                             onSavePaymentClick = { studentName, amount, purpose ->
+
+                                val today = SimpleDateFormat(
+                                    "dd.MM.yyyy",
+                                    Locale.getDefault()
+                                ).format(Date())
+
+                                val newPayment = Payment(
+                                    studentName = studentName,
+                                    amount = amount,
+                                    purpose = purpose,
+                                    date = today
+                                )
+
+                                payments = payments + newPayment
                                 classBalance += amount
+
+                                localStorage.savePayments(payments)
+                                localStorage.saveBalance(classBalance)
 
                                 Toast.makeText(
                                     this,
                                     "Dodano wpłatę: $studentName - $amount zł",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                currentScreen = "treasurer_dashboard"
+                            },
+                            onBackClick = {
+                                currentScreen = "treasurer_dashboard"
+                            }
+                        )
+                    }
+
+                    "payments" -> {
+                        PaymentsScreen(
+                            payments = payments,
+                            onBackClick = {
+                                currentScreen = "treasurer_dashboard"
+                            }
+                        )
+                    }
+
+                    "add_expense" -> {
+                        AddExpenseScreen(
+                            onSaveExpenseClick = { amount, purpose ->
+
+                                val today = SimpleDateFormat(
+                                    "dd.MM.yyyy",
+                                    Locale.getDefault()
+                                ).format(Date())
+
+                                val newExpense = Expense(
+                                    amount = amount,
+                                    purpose = purpose,
+                                    date = today
+                                )
+
+                                expenses = expenses + newExpense
+                                classBalance -= amount
+
+                                localStorage.saveExpenses(expenses)
+                                localStorage.saveBalance(classBalance)
+
+                                Toast.makeText(
+                                    this,
+                                    "Dodano wydatek: $amount zł",
                                     Toast.LENGTH_SHORT
                                 ).show()
 

@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,28 +21,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import pl.nikola.classfund.R
 
 @Composable
-fun AddPaymentScreen(
-    students: List<String>,
-    onSavePaymentClick: (String, Double, String) -> Unit,
+fun AddExpenseScreen(
+    onSaveExpenseClick: (Double, String) -> Unit,
     onBackClick: () -> Unit
 ) {
-    var selectedStudent by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
     var purpose by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    var studentMenuExpanded by remember { mutableStateOf(false) }
-
-    val errorEmptyFields = stringResource(R.string.error_payment_empty_fields)
-    val errorInvalidAmount = stringResource(R.string.error_invalid_amount)
 
     BackHandler {
         onBackClick()
@@ -79,77 +68,13 @@ fun AddPaymentScreen(
         ) {
 
             Text(
-                text = stringResource(R.string.add_payment_title),
+                text = "Dodaj wydatek",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(32.dp))
-
-            Box(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-                OutlinedButton(
-                    onClick = {
-                        studentMenuExpanded = true
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = if (selectedStudent.isBlank()) {
-                            "Wybierz ucznia"
-                        } else {
-                            selectedStudent
-                        }
-                    )
-                }
-
-                DropdownMenu(
-                    expanded = studentMenuExpanded,
-                    onDismissRequest = {
-                        studentMenuExpanded = false
-                    }
-                ) {
-
-                    if (students.isEmpty()) {
-
-                        DropdownMenuItem(
-                            text = {
-                                Text("Brak uczniów")
-                            },
-                            onClick = {
-                                studentMenuExpanded = false
-                            }
-                        )
-
-                    } else {
-
-                        students
-                            .sortedBy { student ->
-                                student.trim()
-                                    .substringAfterLast(" ")
-                                    .lowercase()
-                            }
-                            .forEach { student ->
-
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(student)
-                                    },
-                                    onClick = {
-                                        selectedStudent = student
-                                        studentMenuExpanded = false
-                                        errorMessage = null
-                                    }
-                                )
-                            }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = amount,
@@ -158,7 +83,10 @@ fun AddPaymentScreen(
                     errorMessage = null
                 },
                 label = {
-                    Text(stringResource(R.string.payment_amount))
+                    Text("Kwota wydatku")
+                },
+                placeholder = {
+                    Text("np. 120,00")
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal
@@ -176,7 +104,10 @@ fun AddPaymentScreen(
                     errorMessage = null
                 },
                 label = {
-                    Text(stringResource(R.string.payment_purpose))
+                    Text("Cel wydatku")
+                },
+                placeholder = {
+                    Text("np. prezent dla nauczyciela")
                 },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -188,8 +119,8 @@ fun AddPaymentScreen(
 
                 Text(
                     text = errorMessage!!,
-                    textAlign = TextAlign.Center,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center
                 )
             }
 
@@ -198,13 +129,9 @@ fun AddPaymentScreen(
             Button(
                 onClick = {
 
-                    if (
-                        selectedStudent.isBlank() ||
-                        amount.isBlank() ||
-                        purpose.isBlank()
-                    ) {
+                    if (amount.isBlank() || purpose.isBlank()) {
 
-                        errorMessage = errorEmptyFields
+                        errorMessage = "Uzupełnij wszystkie pola"
 
                     } else {
 
@@ -214,12 +141,11 @@ fun AddPaymentScreen(
 
                         if (parsedAmount == null || parsedAmount <= 0.0) {
 
-                            errorMessage = errorInvalidAmount
+                            errorMessage = "Podaj prawidłową kwotę"
 
                         } else {
 
-                            onSavePaymentClick(
-                                selectedStudent,
+                            onSaveExpenseClick(
                                 parsedAmount,
                                 purpose.trim()
                             )
@@ -228,10 +154,7 @@ fun AddPaymentScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-
-                Text(
-                    text = stringResource(R.string.save_payment)
-                )
+                Text(text = "Zapisz wydatek")
             }
         }
     }
