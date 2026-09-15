@@ -159,6 +159,11 @@ class LocalStorage(context: Context) {
                 expense.date
             )
 
+            jsonObject.put(
+                "attachmentUri",
+                expense.attachmentUri ?: JSONObject.NULL
+            )
+
             jsonArray.put(jsonObject)
         }
 
@@ -182,11 +187,22 @@ class LocalStorage(context: Context) {
 
             val jsonObject = jsonArray.getJSONObject(index)
 
+            val attachmentUri =
+                if (
+                    jsonObject.has("attachmentUri") &&
+                    !jsonObject.isNull("attachmentUri")
+                ) {
+                    jsonObject.getString("attachmentUri")
+                } else {
+                    null
+                }
+
             expenses.add(
                 Expense(
                     amount = jsonObject.getDouble("amount"),
                     purpose = jsonObject.getString("purpose"),
-                    date = jsonObject.getString("date")
+                    date = jsonObject.getString("date"),
+                    attachmentUri = attachmentUri
                 )
             )
         }

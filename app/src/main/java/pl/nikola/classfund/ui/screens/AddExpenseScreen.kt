@@ -1,6 +1,9 @@
 package pl.nikola.classfund.ui.screens
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,12 +33,21 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun AddExpenseScreen(
-    onSaveExpenseClick: (Double, String) -> Unit,
+    onSaveExpenseClick: (Double, String, String?) -> Unit,
     onBackClick: () -> Unit
 ) {
     var amount by remember { mutableStateOf("") }
     var purpose by remember { mutableStateOf("") }
+    var attachmentUri by remember { mutableStateOf<Uri?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val attachmentLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            attachmentUri = uri
+        }
+    }
 
     BackHandler {
         onBackClick()
@@ -113,6 +126,34 @@ fun AddExpenseScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedButton(
+                onClick = {
+                    attachmentLauncher.launch("*/*")
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = if (attachmentUri == null) {
+                        "📎 Dodaj paragon / załącznik"
+                    } else {
+                        "✓ Załącznik dodany"
+                    }
+                )
+            }
+
+            if (attachmentUri != null) {
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Kliknij ponownie, aby wybrać inny plik",
+                    fontSize = 13.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+
             if (errorMessage != null) {
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -147,7 +188,8 @@ fun AddExpenseScreen(
 
                             onSaveExpenseClick(
                                 parsedAmount,
-                                purpose.trim()
+                                purpose.trim(),
+                                attachmentUri?.toString()
                             )
                         }
                     }

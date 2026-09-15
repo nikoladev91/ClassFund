@@ -16,6 +16,7 @@ import pl.nikola.classfund.ui.screens.AddExpenseScreen
 import pl.nikola.classfund.ui.screens.AddPaymentScreen
 import pl.nikola.classfund.ui.screens.AddStudentScreen
 import pl.nikola.classfund.ui.screens.CreateClassScreen
+import pl.nikola.classfund.ui.screens.ExpensesScreen
 import pl.nikola.classfund.ui.screens.JoinClassScreen
 import pl.nikola.classfund.ui.screens.ParentRegisterScreen
 import pl.nikola.classfund.ui.screens.PaymentsScreen
@@ -144,7 +145,7 @@ class MainActivity : ComponentActivity() {
                                 currentScreen = "payments"
                             },
                             onExpensesClick = {
-                                currentScreen = "add_expense"
+                                currentScreen = "expenses"
                             },
                             onStudentsClick = {
                                 currentScreen = "students"
@@ -245,10 +246,21 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
+                    "expenses" -> {
+                        ExpensesScreen(
+                            expenses = expenses,
+                            onAddExpenseClick = {
+                                currentScreen = "add_expense"
+                            },
+                            onBackClick = {
+                                currentScreen = "treasurer_dashboard"
+                            }
+                        )
+                    }
+
                     "add_expense" -> {
                         AddExpenseScreen(
-                            onSaveExpenseClick = { amount, purpose ->
-
+                            onSaveExpenseClick = { amount, purpose, attachmentUri ->
                                 val today = SimpleDateFormat(
                                     "dd.MM.yyyy",
                                     Locale.getDefault()
@@ -257,7 +269,8 @@ class MainActivity : ComponentActivity() {
                                 val newExpense = Expense(
                                     amount = amount,
                                     purpose = purpose,
-                                    date = today
+                                    date = today,
+                                    attachmentUri = attachmentUri
                                 )
 
                                 expenses = expenses + newExpense
@@ -272,10 +285,10 @@ class MainActivity : ComponentActivity() {
                                     Toast.LENGTH_SHORT
                                 ).show()
 
-                                currentScreen = "treasurer_dashboard"
+                                currentScreen = "expenses"
                             },
                             onBackClick = {
-                                currentScreen = "treasurer_dashboard"
+                                currentScreen = "expenses"
                             }
                         )
                     }
