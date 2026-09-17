@@ -10,11 +10,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import pl.nikola.classfund.data.LocalStorage
+import pl.nikola.classfund.model.Contribution
 import pl.nikola.classfund.model.Expense
 import pl.nikola.classfund.model.Payment
+import pl.nikola.classfund.ui.screens.AddContributionScreen
 import pl.nikola.classfund.ui.screens.AddExpenseScreen
 import pl.nikola.classfund.ui.screens.AddPaymentScreen
 import pl.nikola.classfund.ui.screens.AddStudentScreen
+import pl.nikola.classfund.ui.screens.ContributionDetailsScreen
+import pl.nikola.classfund.ui.screens.ContributionsScreen
 import pl.nikola.classfund.ui.screens.CreateClassScreen
 import pl.nikola.classfund.ui.screens.ExpensesScreen
 import pl.nikola.classfund.ui.screens.JoinClassScreen
@@ -72,8 +76,16 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf(localStorage.getExpenses())
                 }
 
+                var contributions by remember {
+                    mutableStateOf(localStorage.getContributions())
+                }
+
                 var selectedStudent by remember {
                     mutableStateOf("")
+                }
+
+                var selectedContribution by remember {
+                    mutableStateOf<Contribution?>(null)
                 }
 
                 when (currentScreen) {
@@ -147,6 +159,9 @@ class MainActivity : ComponentActivity() {
                             onExpensesClick = {
                                 currentScreen = "expenses"
                             },
+                            onContributionsClick = {
+                                currentScreen = "contributions"
+                            },
                             onStudentsClick = {
                                 currentScreen = "students"
                             }
@@ -203,7 +218,12 @@ class MainActivity : ComponentActivity() {
                     "add_payment" -> {
                         AddPaymentScreen(
                             students = students,
-                            onSavePaymentClick = { studentName, amount, purpose ->
+                            contributions = contributions,
+                            onSavePaymentClick = {
+                                    studentName,
+                                    amount,
+                                    purpose,
+                                    contributionName ->
 
                                 val today = SimpleDateFormat(
                                     "dd.MM.yyyy",
@@ -214,7 +234,8 @@ class MainActivity : ComponentActivity() {
                                     studentName = studentName,
                                     amount = amount,
                                     purpose = purpose,
-                                    date = today
+                                    date = today,
+                                    contributionName = contributionName
                                 )
 
                                 payments = payments + newPayment
@@ -260,7 +281,11 @@ class MainActivity : ComponentActivity() {
 
                     "add_expense" -> {
                         AddExpenseScreen(
-                            onSaveExpenseClick = { amount, purpose, attachmentUri ->
+                            onSaveExpenseClick = {
+                                    amount,
+                                    purpose,
+                                    attachmentUri ->
+
                                 val today = SimpleDateFormat(
                                     "dd.MM.yyyy",
                                     Locale.getDefault()
@@ -289,6 +314,77 @@ class MainActivity : ComponentActivity() {
                             },
                             onBackClick = {
                                 currentScreen = "expenses"
+                            }
+                        )
+                    }
+
+                    "contributions" -> {
+                        ContributionsScreen(
+                            contributions = contributions,
+                            onContributionClick = { contribution ->
+                                selectedContribution = contribution
+                                currentScreen = "contribution_details"
+                            },
+                            onAddContributionClick = {
+                                currentScreen = "add_contribution"
+                            },
+                            onBackClick = {
+                                currentScreen = "treasurer_dashboard"
+                            }
+                        )
+                    }
+
+                    "contribution_details" -> {
+
+                        selectedContribution?.let { contribution ->
+
+                            ContributionDetailsScreen(
+                                contribution = contribution,
+                                students = students,
+                                payments = payments,
+                                onBackClick = {
+                                    currentScreen = "contributions"
+                                }
+                            )
+                        }
+                    }
+
+                    "add_contribution" -> {
+                        AddContributionScreen(
+                            onSaveContributionClick = {
+                                    name,
+                                    amount,
+                                    dueDate ->
+
+                                val today = SimpleDateFormat(
+                                    "dd.MM.yyyy",
+                                    Locale.getDefault()
+                                ).format(Date())
+
+                                val newContribution = Contribution(
+                                    name = name,
+                                    amountPerStudent = amount,
+                                    createdDate = today,
+                                    dueDate = dueDate
+                                )
+
+                                contributions =
+                                    contributions + newContribution
+
+                                localStorage.saveContributions(
+                                    contributions
+                                )
+
+                                Toast.makeText(
+                                    this,
+                                    "Dodano składkę: $name",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                currentScreen = "contributions"
+                            },
+                            onBackClick = {
+                                currentScreen = "contributions"
                             }
                         )
                     }

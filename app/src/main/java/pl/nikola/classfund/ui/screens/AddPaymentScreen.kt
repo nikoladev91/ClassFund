@@ -31,18 +31,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.nikola.classfund.R
+import pl.nikola.classfund.model.Contribution
 
 @Composable
 fun AddPaymentScreen(
     students: List<String>,
-    onSavePaymentClick: (String, Double, String) -> Unit,
+    contributions: List<Contribution>,
+    onSavePaymentClick: (String, Double, String, String?) -> Unit,
     onBackClick: () -> Unit
 ) {
     var selectedStudent by remember { mutableStateOf("") }
+    var selectedContribution by remember { mutableStateOf<String?>(null) }
+
     var amount by remember { mutableStateOf("") }
     var purpose by remember { mutableStateOf("") }
+
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
     var studentMenuExpanded by remember { mutableStateOf(false) }
+    var contributionMenuExpanded by remember { mutableStateOf(false) }
 
     val errorEmptyFields = stringResource(R.string.error_payment_empty_fields)
     val errorInvalidAmount = stringResource(R.string.error_invalid_amount)
@@ -151,6 +158,71 @@ fun AddPaymentScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                OutlinedButton(
+                    onClick = {
+                        contributionMenuExpanded = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = selectedContribution ?: "Wybierz składkę"
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = contributionMenuExpanded,
+                    onDismissRequest = {
+                        contributionMenuExpanded = false
+                    }
+                ) {
+
+                    DropdownMenuItem(
+                        text = {
+                            Text("Bez przypisania do składki")
+                        },
+                        onClick = {
+                            selectedContribution = null
+                            contributionMenuExpanded = false
+                            errorMessage = null
+                        }
+                    )
+
+                    contributions.forEach { contribution ->
+
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    "${contribution.name} - " +
+                                            String.format(
+                                                "%.2f zł",
+                                                contribution.amountPerStudent
+                                            ).replace(".", ",")
+                                )
+                            },
+                            onClick = {
+                                selectedContribution = contribution.name
+                                contributionMenuExpanded = false
+                                errorMessage = null
+
+                                purpose = contribution.name
+
+                                if (amount.isBlank()) {
+                                    amount = contribution.amountPerStudent
+                                        .toString()
+                                        .replace(".", ",")
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             OutlinedTextField(
                 value = amount,
                 onValueChange = {
@@ -221,7 +293,8 @@ fun AddPaymentScreen(
                             onSavePaymentClick(
                                 selectedStudent,
                                 parsedAmount,
-                                purpose.trim()
+                                purpose.trim(),
+                                selectedContribution
                             )
                         }
                     }

@@ -3,6 +3,7 @@ package pl.nikola.classfund.data
 import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
+import pl.nikola.classfund.model.Contribution
 import pl.nikola.classfund.model.Expense
 import pl.nikola.classfund.model.Payment
 
@@ -100,6 +101,11 @@ class LocalStorage(context: Context) {
                 payment.date
             )
 
+            jsonObject.put(
+                "contributionName",
+                payment.contributionName ?: JSONObject.NULL
+            )
+
             jsonArray.put(jsonObject)
         }
 
@@ -123,12 +129,23 @@ class LocalStorage(context: Context) {
 
             val jsonObject = jsonArray.getJSONObject(index)
 
+            val contributionName =
+                if (
+                    jsonObject.has("contributionName") &&
+                    !jsonObject.isNull("contributionName")
+                ) {
+                    jsonObject.getString("contributionName")
+                } else {
+                    null
+                }
+
             payments.add(
                 Payment(
                     studentName = jsonObject.getString("studentName"),
                     amount = jsonObject.getDouble("amount"),
                     purpose = jsonObject.getString("purpose"),
-                    date = jsonObject.getString("date")
+                    date = jsonObject.getString("date"),
+                    contributionName = contributionName
                 )
             )
         }
@@ -208,6 +225,70 @@ class LocalStorage(context: Context) {
         }
 
         return expenses
+    }
+
+    fun saveContributions(contributions: List<Contribution>) {
+
+        val jsonArray = JSONArray()
+
+        contributions.forEach { contribution ->
+
+            val jsonObject = JSONObject()
+
+            jsonObject.put(
+                "name",
+                contribution.name
+            )
+
+            jsonObject.put(
+                "amountPerStudent",
+                contribution.amountPerStudent
+            )
+
+            jsonObject.put(
+                "createdDate",
+                contribution.createdDate
+            )
+
+            jsonObject.put(
+                "dueDate",
+                contribution.dueDate
+            )
+
+            jsonArray.put(jsonObject)
+        }
+
+        preferences.edit()
+            .putString("contributions", jsonArray.toString())
+            .apply()
+    }
+
+    fun getContributions(): List<Contribution> {
+
+        val savedContributions = preferences.getString(
+            "contributions",
+            null
+        ) ?: return emptyList()
+
+        val jsonArray = JSONArray(savedContributions)
+
+        val contributions = mutableListOf<Contribution>()
+
+        for (index in 0 until jsonArray.length()) {
+
+            val jsonObject = jsonArray.getJSONObject(index)
+
+            contributions.add(
+                Contribution(
+                    name = jsonObject.getString("name"),
+                    amountPerStudent = jsonObject.getDouble("amountPerStudent"),
+                    createdDate = jsonObject.getString("createdDate"),
+                    dueDate = jsonObject.getString("dueDate")
+                )
+            )
+        }
+
+        return contributions
     }
 
     fun saveBalance(balance: Double) {

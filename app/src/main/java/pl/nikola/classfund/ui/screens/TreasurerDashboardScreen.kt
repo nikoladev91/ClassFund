@@ -30,6 +30,7 @@ fun TreasurerDashboardScreen(
     onAddPaymentClick: () -> Unit,
     onPaymentsClick: () -> Unit,
     onExpensesClick: () -> Unit,
+    onContributionsClick: () -> Unit,
     onStudentsClick: () -> Unit
 ) {
     Column(
@@ -103,6 +104,14 @@ fun TreasurerDashboardScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
                     onExpensesClick()
+                }
+            )
+
+            Text(
+                text = "Składki",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable {
+                    onContributionsClick()
                 }
             )
 

@@ -4,5 +4,6 @@ data class Payment(
     val studentName: String,
     val amount: Double,
     val purpose: String,
-    val date: String
+    val date: String,
+    val contributionName: String? = null
 )
