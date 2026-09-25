@@ -26,6 +26,7 @@ import pl.nikola.classfund.model.Expense
 @Composable
 fun ExpensesScreen(
     expenses: List<Expense>,
+    onExpenseClick: (Expense) -> Unit,
     onAddExpenseClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -71,14 +72,19 @@ fun ExpensesScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
+                        .clickable {
+                            onExpenseClick(expense)
+                        }
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp)
                     ) {
 
                         Text(
-                            text = String.format("%.2f zł", expense.amount)
-                                .replace(".", ","),
+                            text = String.format(
+                                "%.2f zł",
+                                expense.amount
+                            ).replace(".", ","),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -107,7 +113,9 @@ fun ExpensesScreen(
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.clickable {
 
-                                    val uri = Uri.parse(expense.attachmentUri)
+                                    val uri = Uri.parse(
+                                        expense.attachmentUri
+                                    )
 
                                     val intent = Intent(
                                         Intent.ACTION_VIEW

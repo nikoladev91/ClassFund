@@ -22,6 +22,7 @@ import pl.nikola.classfund.model.Payment
 @Composable
 fun PaymentsScreen(
     payments: List<Payment>,
+    onPaymentClick: (Payment) -> Unit,
     onBackClick: () -> Unit
 ) {
     BackHandler {
@@ -64,6 +65,9 @@ fun PaymentsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
+                        .clickable {
+                            onPaymentClick(payment)
+                        }
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp)
@@ -78,17 +82,21 @@ fun PaymentsScreen(
                         Spacer(modifier = Modifier.height(6.dp))
 
                         Text(
-                            text = String.format("%.2f zł", payment.amount)
-                                .replace(".", ","),
+                            text = String.format(
+                                "%.2f zł",
+                                payment.amount
+                            ).replace(".", ","),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
                         )
+
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Text(
                             text = payment.date,
                             fontSize = 14.sp
                         )
+
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Text(

@@ -8,9 +8,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,8 +31,14 @@ fun ContributionDetailsScreen(
     contribution: Contribution,
     students: List<String>,
     payments: List<Payment>,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
+
     val contributionPayments = payments.filter {
         it.contributionName == contribution.name
     }
@@ -50,6 +63,43 @@ fun ContributionDetailsScreen(
 
     BackHandler {
         onBackClick()
+    }
+
+    if (showDeleteDialog) {
+
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog = false
+            },
+            title = {
+                Text("Usuń składkę")
+            },
+            text = {
+                Text(
+                    "Czy na pewno chcesz usunąć tę składkę? " +
+                            "Wpłaty pozostaną w historii klasy."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDeleteClick()
+                    }
+                ) {
+                    Text("Usuń")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Anuluj")
+                }
+            }
+        )
     }
 
     Column(
@@ -205,6 +255,26 @@ fun ContributionDetailsScreen(
             }
 
         Spacer(modifier = Modifier.height(28.dp))
+
+        Button(
+            onClick = onEditClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Edytuj składkę")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = {
+                showDeleteDialog = true
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Usuń składkę")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "← Wróć",

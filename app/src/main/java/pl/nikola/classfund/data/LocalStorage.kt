@@ -6,6 +6,7 @@ import org.json.JSONObject
 import pl.nikola.classfund.model.Contribution
 import pl.nikola.classfund.model.Expense
 import pl.nikola.classfund.model.Payment
+import java.util.UUID
 
 class LocalStorage(context: Context) {
 
@@ -82,6 +83,11 @@ class LocalStorage(context: Context) {
             val jsonObject = JSONObject()
 
             jsonObject.put(
+                "id",
+                payment.id
+            )
+
+            jsonObject.put(
                 "studentName",
                 payment.studentName
             )
@@ -125,9 +131,23 @@ class LocalStorage(context: Context) {
 
         val payments = mutableListOf<Payment>()
 
+        var needsMigration = false
+
         for (index in 0 until jsonArray.length()) {
 
             val jsonObject = jsonArray.getJSONObject(index)
+
+            val paymentId =
+                if (
+                    jsonObject.has("id") &&
+                    !jsonObject.isNull("id") &&
+                    jsonObject.getString("id").isNotBlank()
+                ) {
+                    jsonObject.getString("id")
+                } else {
+                    needsMigration = true
+                    UUID.randomUUID().toString()
+                }
 
             val contributionName =
                 if (
@@ -141,6 +161,7 @@ class LocalStorage(context: Context) {
 
             payments.add(
                 Payment(
+                    id = paymentId,
                     studentName = jsonObject.getString("studentName"),
                     amount = jsonObject.getDouble("amount"),
                     purpose = jsonObject.getString("purpose"),
@@ -148,6 +169,10 @@ class LocalStorage(context: Context) {
                     contributionName = contributionName
                 )
             )
+        }
+
+        if (needsMigration) {
+            savePayments(payments)
         }
 
         return payments
@@ -160,6 +185,11 @@ class LocalStorage(context: Context) {
         expenses.forEach { expense ->
 
             val jsonObject = JSONObject()
+
+            jsonObject.put(
+                "id",
+                expense.id
+            )
 
             jsonObject.put(
                 "amount",
@@ -200,9 +230,23 @@ class LocalStorage(context: Context) {
 
         val expenses = mutableListOf<Expense>()
 
+        var needsMigration = false
+
         for (index in 0 until jsonArray.length()) {
 
             val jsonObject = jsonArray.getJSONObject(index)
+
+            val expenseId =
+                if (
+                    jsonObject.has("id") &&
+                    !jsonObject.isNull("id") &&
+                    jsonObject.getString("id").isNotBlank()
+                ) {
+                    jsonObject.getString("id")
+                } else {
+                    needsMigration = true
+                    UUID.randomUUID().toString()
+                }
 
             val attachmentUri =
                 if (
@@ -216,12 +260,17 @@ class LocalStorage(context: Context) {
 
             expenses.add(
                 Expense(
+                    id = expenseId,
                     amount = jsonObject.getDouble("amount"),
                     purpose = jsonObject.getString("purpose"),
                     date = jsonObject.getString("date"),
                     attachmentUri = attachmentUri
                 )
             )
+        }
+
+        if (needsMigration) {
+            saveExpenses(expenses)
         }
 
         return expenses
