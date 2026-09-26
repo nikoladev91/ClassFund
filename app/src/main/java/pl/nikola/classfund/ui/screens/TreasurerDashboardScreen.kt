@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.nikola.classfund.R
@@ -27,6 +26,10 @@ fun TreasurerDashboardScreen(
     className: String,
     schoolYear: String,
     balance: Double,
+    totalPayments: Double,
+    totalExpenses: Double,
+    studentsCount: Int,
+    contributionsCount: Int,
     onAddPaymentClick: () -> Unit,
     onPaymentsClick: () -> Unit,
     onExpensesClick: () -> Unit,
@@ -84,6 +87,112 @@ fun TreasurerDashboardScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+
+            Card(
+                modifier = Modifier.weight(1f)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Wpłaty",
+                        fontSize = 14.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = String.format(
+                            "%.2f zł",
+                            totalPayments
+                        ).replace(".", ","),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier.weight(1f)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Wydatki",
+                        fontSize = 14.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = String.format(
+                            "%.2f zł",
+                            totalExpenses
+                        ).replace(".", ","),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+
+            Card(
+                modifier = Modifier.weight(1f)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Uczniowie",
+                        fontSize = 14.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = studentsCount.toString(),
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier.weight(1f)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Składki",
+                        fontSize = 14.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = contributionsCount.toString(),
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(28.dp))
 
         Row(
@@ -134,13 +243,5 @@ fun TreasurerDashboardScreen(
                 text = stringResource(R.string.add_payment)
             )
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = stringResource(R.string.dashboard_empty_state),
-            textAlign = TextAlign.Center,
-            fontSize = 14.sp
-        )
     }
 }

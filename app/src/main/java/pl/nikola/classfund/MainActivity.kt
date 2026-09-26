@@ -158,22 +158,41 @@ class MainActivity : ComponentActivity() {
                     }
 
                     "treasurer_dashboard" -> {
+
+                        val totalPayments = payments.sumOf { payment ->
+                            payment.amount
+                        }
+
+                        val totalExpenses = expenses.sumOf { expense ->
+                            expense.amount
+                        }
+
                         TreasurerDashboardScreen(
                             className = createdClassName,
                             schoolYear = createdSchoolYear,
                             balance = classBalance,
+
+                            totalPayments = totalPayments,
+                            totalExpenses = totalExpenses,
+                            studentsCount = students.size,
+                            contributionsCount = contributions.size,
+
                             onAddPaymentClick = {
                                 currentScreen = "add_payment"
                             },
+
                             onPaymentsClick = {
                                 currentScreen = "payments"
                             },
+
                             onExpensesClick = {
                                 currentScreen = "expenses"
                             },
+
                             onContributionsClick = {
                                 currentScreen = "contributions"
                             },
+
                             onStudentsClick = {
                                 currentScreen = "students"
                             }
