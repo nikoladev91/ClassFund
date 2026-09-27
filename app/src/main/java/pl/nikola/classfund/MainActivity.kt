@@ -52,19 +52,34 @@ class MainActivity : ComponentActivity() {
                 val localStorage = remember {
                     LocalStorage(this)
                 }
+                val migratedClass = remember {
+                    localStorage.migrateOldDataIfNeeded()
+                }
 
                 var currentScreen by remember {
-                    mutableStateOf("treasurer_dashboard")
+                    mutableStateOf("welcome")
                 }
 
                 var createdClassName by remember {
-                    mutableStateOf(localStorage.getClassName())
+                    mutableStateOf(
+                        migratedClass?.name
+                            ?: localStorage.getClassName()
+                    )
                 }
 
                 var createdSchoolYear by remember {
-                    mutableStateOf(localStorage.getSchoolYear())
+                    mutableStateOf(
+                        migratedClass?.schoolYear
+                            ?: localStorage.getSchoolYear()
+                    )
                 }
 
+                var classCode by remember {
+                    mutableStateOf(
+                        migratedClass?.classCode
+                            ?: localStorage.getClassCode()
+                    )
+                }
                 var classBalance by remember {
                     mutableStateOf(localStorage.getBalance())
                 }
@@ -149,6 +164,9 @@ class MainActivity : ComponentActivity() {
                                 localStorage.saveClassName(className)
                                 localStorage.saveSchoolYear(schoolYear)
 
+                                classCode =
+                                    localStorage.generateClassCode(className)
+
                                 currentScreen = "treasurer_dashboard"
                             },
                             onBackClick = {
@@ -156,7 +174,6 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
-
                     "treasurer_dashboard" -> {
 
                         val totalPayments = payments.sumOf { payment ->
@@ -170,6 +187,7 @@ class MainActivity : ComponentActivity() {
                         TreasurerDashboardScreen(
                             className = createdClassName,
                             schoolYear = createdSchoolYear,
+                            classCode = classCode,
                             balance = classBalance,
 
                             totalPayments = totalPayments,
@@ -773,12 +791,14 @@ class MainActivity : ComponentActivity() {
 
                     "join_class" -> {
                         JoinClassScreen(
-                            onJoinClassClick = {
+                            onJoinClassClick = { classCode ->
+
                                 Toast.makeText(
                                     this,
-                                    "Dołączono do klasy",
+                                    "Kod klasy: $classCode",
                                     Toast.LENGTH_SHORT
                                 ).show()
+
                             },
                             onBackClick = {
                                 currentScreen = "parent_register"

@@ -19,13 +19,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.nikola.classfund.R
 import pl.nikola.classfund.model.Contribution
 import pl.nikola.classfund.model.Payment
+import androidx.compose.ui.res.stringResource
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -34,6 +35,7 @@ import java.util.Locale
 fun TreasurerDashboardScreen(
     className: String,
     schoolYear: String,
+    classCode: String,
     balance: Double,
     totalPayments: Double,
     totalExpenses: Double,
@@ -47,6 +49,7 @@ fun TreasurerDashboardScreen(
     onContributionClick: (Contribution) -> Unit,
     onStudentsClick: () -> Unit
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -73,7 +76,48 @@ fun TreasurerDashboardScreen(
             fontSize = 16.sp
         )
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(18.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(18.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Text(
+                    text = "Kod klasy",
+                    fontSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = if (classCode.isNotBlank()) {
+                        classCode
+                    } else {
+                        "Brak kodu"
+                    },
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = "Przekaż ten kod rodzicom, aby mogli dołączyć do klasy.",
+                    fontSize = 13.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -334,6 +378,7 @@ fun TreasurerDashboardScreen(
                 }
 
                 val todayText = dateFormat.format(Date())
+
                 val today = try {
                     dateFormat.parse(todayText)
                 } catch (_: Exception) {
