@@ -226,6 +226,7 @@ class MainActivity : ComponentActivity() {
                         StudentDetailsScreen(
                             studentName = selectedStudent,
                             payments = payments,
+                            contributions = contributions,
                             onBackClick = {
                                 currentScreen = "students"
                             }
