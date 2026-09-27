@@ -174,8 +174,10 @@ class MainActivity : ComponentActivity() {
 
                             totalPayments = totalPayments,
                             totalExpenses = totalExpenses,
-                            studentsCount = students.size,
-                            contributionsCount = contributions.size,
+
+                            students = students,
+                            contributions = contributions,
+                            payments = payments,
 
                             onAddPaymentClick = {
                                 currentScreen = "add_payment"
@@ -191,6 +193,11 @@ class MainActivity : ComponentActivity() {
 
                             onContributionsClick = {
                                 currentScreen = "contributions"
+                            },
+
+                            onContributionClick = { contribution ->
+                                selectedContribution = contribution
+                                currentScreen = "contribution_details"
                             },
 
                             onStudentsClick = {
