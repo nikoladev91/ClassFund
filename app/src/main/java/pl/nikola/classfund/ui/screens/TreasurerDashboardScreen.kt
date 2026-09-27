@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.sp
 import pl.nikola.classfund.R
 import pl.nikola.classfund.model.Contribution
 import pl.nikola.classfund.model.Payment
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun TreasurerDashboardScreen(
@@ -269,12 +272,10 @@ fun TreasurerDashboardScreen(
         if (contributions.isNotEmpty()) {
 
             Text(
-                text = "Aktywne składki",
+                text = "Składki",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(
-                    Alignment.Start
-                )
+                modifier = Modifier.align(Alignment.Start)
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -283,13 +284,11 @@ fun TreasurerDashboardScreen(
 
                 val contributionPayments =
                     payments.filter { payment ->
-                        payment.contributionName ==
-                                contribution.name
+                        payment.contributionName == contribution.name
                     }
 
                 val requiredTotal =
-                    students.size *
-                            contribution.amountPerStudent
+                    students.size * contribution.amountPerStudent
 
                 val collectedTotal =
                     contributionPayments.sumOf {
@@ -302,8 +301,7 @@ fun TreasurerDashboardScreen(
                         val paidByStudent =
                             contributionPayments
                                 .filter {
-                                    it.studentName ==
-                                            student
+                                    it.studentName == student
                                 }
                                 .sumOf {
                                     it.amount
@@ -315,25 +313,53 @@ fun TreasurerDashboardScreen(
 
                 val progress =
                     if (requiredTotal > 0.0) {
-                        (
-                                collectedTotal /
-                                        requiredTotal
-                                )
+                        (collectedTotal / requiredTotal)
                             .toFloat()
-                            .coerceIn(
-                                0f,
-                                1f
-                            )
+                            .coerceIn(0f, 1f)
                     } else {
                         0f
                     }
 
+                val dateFormat = SimpleDateFormat(
+                    "dd.MM.yyyy",
+                    Locale.getDefault()
+                )
+
+                dateFormat.isLenient = false
+
+                val dueDate = try {
+                    dateFormat.parse(contribution.dueDate)
+                } catch (_: Exception) {
+                    null
+                }
+
+                val todayText = dateFormat.format(Date())
+                val today = try {
+                    dateFormat.parse(todayText)
+                } catch (_: Exception) {
+                    null
+                }
+
+                val isFullyPaid =
+                    requiredTotal > 0.0 &&
+                            collectedTotal >= requiredTotal
+
+                val isOverdue =
+                    !isFullyPaid &&
+                            dueDate != null &&
+                            today != null &&
+                            dueDate.before(today)
+
+                val statusText = when {
+                    isFullyPaid -> "✓ Opłacona"
+                    isOverdue -> "⚠ Po terminie"
+                    else -> "Aktywna"
+                }
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(
-                            vertical = 6.dp
-                        )
+                        .padding(vertical = 6.dp)
                         .clickable {
                             onContributionClick(
                                 contribution
@@ -343,39 +369,39 @@ fun TreasurerDashboardScreen(
                 ) {
 
                     Column(
-                        modifier = Modifier.padding(
-                            18.dp
-                        )
+                        modifier = Modifier.padding(18.dp)
                     ) {
 
                         Text(
                             text = contribution.name,
                             fontSize = 19.sp,
-                            fontWeight =
-                                FontWeight.Bold
+                            fontWeight = FontWeight.Bold
                         )
 
                         Spacer(
-                            modifier =
-                                Modifier.height(6.dp)
+                            modifier = Modifier.height(6.dp)
                         )
 
                         Text(
-                            text =
-                                String.format(
-                                    "%.2f zł / uczeń",
-                                    contribution
-                                        .amountPerStudent
-                                ).replace(
-                                    ".",
-                                    ","
-                                ),
+                            text = statusText,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(8.dp)
+                        )
+
+                        Text(
+                            text = String.format(
+                                "%.2f zł / uczeń",
+                                contribution.amountPerStudent
+                            ).replace(".", ","),
                             fontSize = 14.sp
                         )
 
                         Spacer(
-                            modifier =
-                                Modifier.height(14.dp)
+                            modifier = Modifier.height(14.dp)
                         )
 
                         Text(
@@ -384,39 +410,29 @@ fun TreasurerDashboardScreen(
                                         String.format(
                                             "%.2f zł",
                                             collectedTotal
-                                        ).replace(
-                                            ".",
-                                            ","
-                                        ) +
+                                        ).replace(".", ",") +
                                         " z " +
                                         String.format(
                                             "%.2f zł",
                                             requiredTotal
-                                        ).replace(
-                                            ".",
-                                            ","
-                                        ),
+                                        ).replace(".", ","),
                             fontSize = 15.sp,
-                            fontWeight =
-                                FontWeight.Medium
+                            fontWeight = FontWeight.Medium
                         )
 
                         Spacer(
-                            modifier =
-                                Modifier.height(8.dp)
+                            modifier = Modifier.height(8.dp)
                         )
 
                         LinearProgressIndicator(
                             progress = {
                                 progress
                             },
-                            modifier =
-                                Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth()
                         )
 
                         Spacer(
-                            modifier =
-                                Modifier.height(10.dp)
+                            modifier = Modifier.height(10.dp)
                         )
 
                         Text(
@@ -428,8 +444,7 @@ fun TreasurerDashboardScreen(
                         )
 
                         Spacer(
-                            modifier =
-                                Modifier.height(4.dp)
+                            modifier = Modifier.height(4.dp)
                         )
 
                         Text(
